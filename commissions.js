@@ -165,7 +165,7 @@
     function getOrganization(serviceEndpoint) {
       var url = serviceEndpoint;
       var deferred = $q.defer();
-        $http.post(url)
+        $http.get(url)
           .success(function (data) {
             deferred.resolve(data);
             console.log(data);

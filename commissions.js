@@ -82,7 +82,7 @@
     }
     
     function getMemberList(organizationId) {
-      vm.getOrganizationObj();
+      vm.getOrganizationObj(organizationId);
       vm.spinner = 1;
       var OrganizationMembersUrl = urlBuilderFactory.getMembers(vm.organization);
       MembersFactory.getMemberList(OrganizationMembersUrl)

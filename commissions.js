@@ -28,6 +28,8 @@
     vm.member.moveDown = moveDownMember;    
     vm.getOrganizationObj = getOrganizationObject;
     
+    vm.getOrganizationObj();
+    
     function getOrganizationObject (organizationId) {
       var OrganizationMembersUrl = urlBuilderFactory.getOrganization(vm.organization);
       MembersFactory.getOrganization(OrganizationMembersUrl)

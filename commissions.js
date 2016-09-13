@@ -14,7 +14,7 @@
   function ComMembersController($scope, MembersFactory, urlBuilderFactory) {
     
     var vm = this;
-    vm.organization = 2130348;
+    vm.organization = "";
     vm.spinner = 0;
     vm.member = {};
     vm.member.list = [];
@@ -26,6 +26,17 @@
     vm.member.remove = removeMember;
     vm.member.moveUp = moveUpMember;
     vm.member.moveDown = moveDownMember;    
+    vm.getOrganizationObj = getOrganizationObject;
+    
+    function getOrganizationObject (organizationId) {
+      var OrganizationMembersUrl = urlBuilderFactory.getOrganization(vm.organization);
+      MembersFactory.getOrganization(OrganizationMembersUrl)
+        .then(
+          function(data) {
+            vm.OrganizationName = data.name;
+          } 
+        )
+    }
     
     function initiateNewMember() {
       MembersFactory.initiateNewMember()
@@ -96,9 +107,10 @@
   function MembersFactory($http, $q) {
     
     var service = {
-      initiateNewMember: initiateNewMember,
-      getMemberList: getMemberList,
-      saveMemberList: saveMemberList,
+      "initiateNewMember": initiateNewMember,
+      "getMemberList": getMemberList,
+      "saveMemberList": saveMemberList,
+      "getOrganization": getOrganization
     };
     
     return service;
@@ -146,6 +158,20 @@
         deferred.resolve(MemberObject);
       return deferred.promise;
     }
+    
+    function getOrganization(serviceEndpoint) {
+      var url = serviceEndpoint;
+      var deferred = $q.defer();
+        $http.post(url)
+          .success(function (data) {
+            deferred.resolve(data);
+            console.log(data);
+          }).error(function (msg, code) {
+            deferred.reject(msg);
+            console.log(msg, code);
+          });
+      return deferred.promise;
+    }
 
   }
   
@@ -158,6 +184,7 @@
       "columnName": 'commission_members',
       "cmdGetJsonData": encodeURIComponent('{"/expandovalue/get-json-data":{}}'),
       "cmdAddValue": encodeURIComponent('{"/expandovalue/add-value":{}}'),
+      "cmdGetOrganization": encodeURIComponent('{"/organization/get-organization":{}}'),
       "authToken": Liferay.authToken
     }
   } else {
@@ -169,6 +196,7 @@
       "columnName": 'commission_members',
       "cmdGetJsonData": encodeURIComponent('{"/expandovalue/get-json-data":{}}'),
       "cmdAddValue": encodeURIComponent('{"/expandovalue/add-value":{}}'),
+      "cmdGetOrganization": encodeURIComponent('{"/organization/get-organization":{}}'),
       "authToken": "testtoken"
     }
   }
@@ -180,8 +208,9 @@
   function urlBuilderFactory () {
     
     var service = {
-      saveMembers: saveMembers,
-      getMembers: getMembers
+      "saveMembers": saveMembers,
+      "getMembers": getMembers,
+      "getOrganization": getOrganization
     };
     
     return service;
@@ -213,6 +242,17 @@
         '&columnName='+serviceConfig.columnName,
         '&classPK='+orgId,
         '&cmd='+serviceConfig.cmdGetJsonData,
+        '&p_auth='+serviceConfig.authToken
+      ].join('');
+      return url;
+    }
+    
+    function getOrganization (orgId) {
+      var url = [
+        serviceConfig.baseUrl,
+        '/api/jsonws/invoke',
+        '&organizationId='+orgId,
+        '&cmd='+serviceConfig.cmdGetOrganization,
         '&p_auth='+serviceConfig.authToken
       ].join('');
       return url;
